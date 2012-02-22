@@ -27,7 +27,7 @@ ob_end_clean();
 //$PHPTHUMB_CONFIG['document_root'] = 'c:\\webroot\\example.com\\www';
 //$PHPTHUMB_CONFIG['document_root'] = $_SERVER['DOCUMENT_ROOT'];
 //$PHPTHUMB_CONFIG['document_root'] = realpath((@$_SERVER['DOCUMENT_ROOT'] && file_exists(@$_SERVER['DOCUMENT_ROOT'].$_SERVER['PHP_SELF'])) ? $_SERVER['DOCUMENT_ROOT'] : str_replace(dirname(@$_SERVER['PHP_SELF']), '', str_replace(DIRECTORY_SEPARATOR, '/', realpath('.'))));
-$PHPTHUMB_CONFIG['document_root'] = realpath((getenv('DOCUMENT_ROOT') && ereg('^'.preg_quote(realpath(getenv('DOCUMENT_ROOT'))), realpath(__FILE__))) ? getenv('DOCUMENT_ROOT') : str_replace(dirname(@$_SERVER['PHP_SELF']), '', str_replace(DIRECTORY_SEPARATOR, '/', dirname(__FILE__))));
+$PHPTHUMB_CONFIG['document_root'] = realpath((getenv('DOCUMENT_ROOT') && preg_match('#^'.preg_quote(realpath(getenv('DOCUMENT_ROOT'))).'#', realpath(__FILE__))) ? getenv('DOCUMENT_ROOT') : str_replace(dirname(@$_SERVER['PHP_SELF']), '', str_replace(DIRECTORY_SEPARATOR, '/', dirname(__FILE__))));
 
 // * Cache directory configuration (choose only one of these - leave the other lines commented-out):
 // Note: this directory must be writable (usually chmod 777 is neccesary) for caching to work.
@@ -53,14 +53,14 @@ $PHPTHUMB_CONFIG['cache_maxage'] = null;            // never delete cached thumb
 //$PHPTHUMB_CONFIG['cache_maxage'] = 86400 * 30;        // delete cached thumbnails that haven't been accessed in more than [30 days] (value is maximum time since last access in seconds to avoid deletion)
 
 //$PHPTHUMB_CONFIG['cache_maxsize'] = null;           // never delete cached thumbnails based on byte size of cache directory
-$PHPTHUMB_CONFIG['cache_maxsize'] = 10 * 1024 * 1024; // delete least-recently-accessed cached thumbnails when more than [80MB] of cached files are present (value is maximum bytesize of all cached files)
+$PHPTHUMB_CONFIG['cache_maxsize'] = 10 * 1024 * 1024; // delete least-recently-accessed cached thumbnails when more than [10MB] of cached files are present (value is maximum bytesize of all cached files)
 
 $PHPTHUMB_CONFIG['cache_maxfiles'] = null;          // never delete cached thumbnails based on number of cached files
 //$PHPTHUMB_CONFIG['cache_maxfiles'] = 200;             // delete least-recently-accessed cached thumbnails when more than [200] cached files are present (value is maximum number of cached files to keep)
 
 
 // * Source image cache configuration
-$PHPTHUMB_CONFIG['cache_source_enabled']   = true;                               // if true, source images obtained via HTTP are cached to $PHPTHUMB_CONFIG['cache_source_directory']
+$PHPTHUMB_CONFIG['cache_source_enabled']   = false;                               //TODO: BGE check this // if true, source images obtained via HTTP are cached to $PHPTHUMB_CONFIG['cache_source_directory']
 $PHPTHUMB_CONFIG['cache_source_directory'] = dirname(__FILE__).'/cache/source/';  // set the cache directory for unprocessed source images
 
 // * cache source modification date configuration
@@ -77,8 +77,8 @@ $PHPTHUMB_CONFIG['cache_default_only_suffix'] = '';           // cached in norma
 //$PHPTHUMB_CONFIG['cache_default_only_suffix'] = '*_thumb';  // cache 'pic.jpg' becomes 'pic_thumb.jpg' (or 'pic_thumb.png' if PNG output is selected, etc)
 //$PHPTHUMB_CONFIG['cache_default_only_suffix'] = 'small-*';  // cache 'pic.jpg' becomes 'small-pic.jpg' (or 'small-pic.png' if PNG output is selected, etc)
 
-$PHPTHUMB_CONFIG['cache_prefix'] = 'phpThumb_cache_'.str_replace('www.', '', @$_SERVER['SERVER_NAME']);
-//$PHPTHUMB_CONFIG['cache_prefix'] = 'phpThumb_cache';                         // allow phpThumb to share 1 set of cached files even if accessed under different servername/domains on same server
+$PHPTHUMB_CONFIG['cache_prefix'] = 'phpThumb_cache_'.(isset($_SERVER['SERVER_NAME']) ? str_replace('www.', '', $_SERVER['SERVER_NAME']).'_' : ''); // keep cache file separate by domain
+//$PHPTHUMB_CONFIG['cache_prefix'] = 'phpThumb_cache';                                                                                             // allow phpThumb to share 1 set of cached files even if accessed under different servername/domains on same server
 
 $PHPTHUMB_CONFIG['cache_force_passthru'] = true;  // if true, cached image data will always be passed to browser; if false, HTTP redirect will be used instead
 
@@ -124,8 +124,7 @@ $PHPTHUMB_CONFIG['prefer_imagemagick']        = true;  // If true, use ImageMagi
 $PHPTHUMB_CONFIG['imagemagick_use_thumbnail'] = true;  // If true, use ImageMagick's "-thumbnail" resizing parameter (if available) which removes extra non-image metadata (profiles, EXIF info, etc) resulting in much smaller filesize; if false, use "-resize" paramter which retains this info
 if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
 	// Windows: set absolute pathname
-	// $PHPTHUMB_CONFIG['imagemagick_path'] = 'C:/ImageMagick/convert.exe';
-	$PHPTHUMB_CONFIG['imagemagick_path'] = null;
+	$PHPTHUMB_CONFIG['imagemagick_path'] = 'C:/ImageMagick/convert.exe';
 } else {
 	// *nix: set absolute pathname to "convert", or leave as null if "convert" is in the path (location detected with `which`)
 	//$PHPTHUMB_CONFIG['imagemagick_path'] = '/usr/local/bin/convert';
@@ -195,8 +194,6 @@ $PHPTHUMB_CONFIG['high_security_enabled']    = true;  // if enabled, requires 'h
 $PHPTHUMB_CONFIG['disable_debug']            = true;  // prevent phpThumb from displaying any information about your system. If true, phpThumbDebug and error messages will be disabled
 $PHPTHUMB_CONFIG['allow_src_above_docroot']  = false;  // if true, allow src to be anywhere in filesystem; if false (default) only allow src within document_root
 $PHPTHUMB_CONFIG['allow_src_above_phpthumb'] = true;   // if true (default), allow src to be anywhere in filesystem; if false only allow src within sub-directory of phpThumb installation
-$PHPTHUMB_CONFIG['allow_parameter_file']     = false;  // if true, allow use of 'file' parameter; if false (default) the 'file' parameter is disabled/ignored
-$PHPTHUMB_CONFIG['allow_parameter_goto']     = false;  // if true, allow use of 'goto' parameter; if false (default) the 'goto' parameter is disabled/ignored
 
 // required if 'high_security_enabled' is true, must be at least 5 characters long
 $PHPTHUMB_CONFIG['high_security_password']   = '';
