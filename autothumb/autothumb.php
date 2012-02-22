@@ -328,13 +328,13 @@ class AutoThumb
     {
         $wpRewrite = $this->getRewrite();
 
-        $switch = ($_switch !== false) ? $_switch : get_option('autothumb_clean_urls');
+        //$switch = ($_switch !== false) ? $_switch : get_option('autothumb_clean_urls');
+        $switch = get_option('autothumb_clean_urls');		//TODO: Discuss this with Mathias, the default false switch overrides the option in 3.3.1. What's the intention here?
         $path = ($_path !== false) ? $_path : get_option('autothumb_clean_urls_path');
 
         if ($switch == 1 && $path !== false && !empty($path)) {
             $wpRewrite->non_wp_rules = array($path . '/(.*)$' => 'wp-content/plugins/autothumb/image.php?$1');
         }
-
         if ($_flush) {
             $wpRewrite->flush_rules();
         }
